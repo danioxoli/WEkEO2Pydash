@@ -1,0 +1,16 @@
+name: copernicus
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - xarray
+  - numpy
+  - pydap
+  - cartopy
+  - matplotlib
+  - geemap
+  - pip
+  - pip:
+    - lxml
+    - cdsapi
+    - hda
