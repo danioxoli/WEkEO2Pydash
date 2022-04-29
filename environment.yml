@@ -9,6 +9,7 @@ dependencies:
   - cartopy
   - matplotlib
   - geemap
+  - rasterio
   - pip
   - pip:
     - lxml
