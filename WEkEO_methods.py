@@ -10,6 +10,17 @@ import xarray as xr
 from urllib.request import urlopen
 from ipyleaflet import Map, basemaps, basemap_to_tiles, DrawControl, LayersControl
 
+def get_dropdown(dataset_list, descr):
+    """
+    General function used to create a dropdown providing a list and a description for the widget.
+    """
+    dropdown = widgets.Dropdown(
+    options=list(dataset_list),
+    description=str(descr),
+    disabled=False,
+    style= {'description_width': 'initial'})
+    return dropdown
+
 def text_widget(type_text):
     text = widgets.Text(
     placeholder='Type something',
@@ -42,6 +53,16 @@ def select_buttons(data_list, descr, default_value):
     disabled=False,
     style= {'description_width': 'initial'})
     return format_type_sel
+
+def get_date_picker(date_descr):
+    """
+    Function to create a date picker, providing a description name.
+    """
+    date = widgets.DatePicker(
+        description=str(date_descr),
+        disabled=False,
+        style= {'description_width': 'initial'})
+    return date
     
 def get_token(username, password):
     """
@@ -84,16 +105,6 @@ def get_data_from_name_request(size, dataset_name):
     data_df = data_df[data_df['datasetId'].str.contains(str(dataset_name),  case=False)]
     return data_df
 
-def get_dropdown(dataset_list, descr):
-    """
-    General function used to create a dropdown providing a list and a description for the widget.
-    """
-    dropdown = widgets.Dropdown(
-    options=list(dataset_list),
-    description=str(descr),
-    disabled=False,
-    style= {'description_width': 'initial'})
-    return dropdown
     
 def get_description(data_df, dataset_id):
     """
@@ -279,16 +290,6 @@ def draw_map():
     
     return cams_map, dc
 
-
-def get_date_picker(date_descr):
-    """
-    Function to create a date picker, providing a description name.
-    """
-    date = widgets.DatePicker(
-        description=str(date_descr),
-        disabled=False,
-        style= {'description_width': 'initial'})
-    return date
 
 def api_query_cams_forecast(dataset_id, params_sel, product_type_sel, level_sel, type_sel, hour_sel, leadtime_sel, start_date_sel, end_date_sel, format_type_sel,W,N,E,S, token):
     query = {
