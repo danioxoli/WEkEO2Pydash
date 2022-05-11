@@ -4,14 +4,19 @@ channels:
   - defaults
 dependencies:
   - xarray
+  - pandas
   - numpy
-  - pydap
   - cartopy
   - matplotlib
-  - geemap
-  - rasterio
+  - hvplot
+  - holoviews
+  - bokeh
+  - ipywidgets
+  - base64
+  - json
+  - requests
+  - rioxarray
+  - urllib
+  - ipyleaflet
   - pip
   - pip:
-    - lxml
-    - cdsapi
-    - hda

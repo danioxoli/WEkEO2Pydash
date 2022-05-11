@@ -8,6 +8,7 @@ from PIL import Image
 import IPython
 import xarray as xr
 from urllib.request import urlopen
+from ipyleaflet import Map, basemaps, basemap_to_tiles, DrawControl, LayersControl
 
 def text_widget(type_text):
     text = widgets.Text(
@@ -146,6 +147,9 @@ def era5_single_levels_list(metadata):
     return flat_list
 
 def api_query_era5_single_levels(dataset_id, params_sel, year_sel, month_sel, day_sel, time_sel, product_type_sel, format_type_sel, token):
+    """
+    Function used to query the data for the ERA5 single levels dataset.
+    """
     query = {
       "datasetId": dataset_id.value,
       "multiStringSelectValues": [
@@ -196,6 +200,9 @@ def api_query_era5_single_levels(dataset_id, params_sel, year_sel, month_sel, da
     return job_id
 
 def request_data(jobId, token):
+    """
+    Function to request data, check the status and get the url.
+    """
     headers = {'authorization': 'Basic '+str(token)}
     status_request = requests.get('https://wekeo-broker.apps.mercator.dpi.wekeo.eu/databroker/datarequest/status/'+jobId, headers=headers)
     status = status_request.text
@@ -219,10 +226,16 @@ def request_data(jobId, token):
     get_url_request = requests.get('https://wekeo-broker.apps.mercator.dpi.wekeo.eu/databroker/datarequest/jobs/'+jobId+'/result', headers=headers)
     get_url = json.loads(get_url_request.text)
     url = get_url['content'][0]['url']
-    print('The URL for download is: '+ url)
-    return url
+    print('The URL for download is: '+ get_url['content'][0]['url'])
+    return get_url
 
-def download_type(download_sel, download_list, url, save_as):
+def download_type(download_sel, download_list, get_url):
+    """
+    Function that can read the NetCDF file in memory or downloading it if a name is provided.
+    """
+    url = get_url['content'][0]['url']
+    save_as = get_url['content'][0]['filename']
+    
     if download_sel.value == download_list[1]: 
         fl = url
         # load into memory 
@@ -231,7 +244,116 @@ def download_type(download_sel, download_list, url, save_as):
     elif download_sel.value == download_list[0]:
         with urlopen(url) as file:
             content = file.read()
-            with open(save_as.value, 'wb') as download:
+            with open(save_as, 'wb') as download:
                 download.write(content)
-            ds = xr.open_dataset(str(save_as.value)+".nc")
+            ds = xr.open_dataset(str(save_as))
     return ds
+
+def draw_map():
+    """
+    Function to draw a map and interact with it. It is possible to get the coordinates values from the dc variable. Two basemaps are available.
+    """
+    satellite = basemap_to_tiles(basemaps.Gaode.Satellite)
+    osm = basemap_to_tiles(basemaps.OpenStreetMap.Mapnik)
+
+    cams_map = Map(layers=(satellite, osm ), center=(45, 10), zoom=4)
+
+    dc = DrawControl()
+    lc = LayersControl(position='topright')
+
+    dc = DrawControl(
+        marker={"shapeOptions": {"color": "#0000FF"}},
+        rectangle={"shapeOptions": {"color": "#0000FF"}},
+        circle={"shapeOptions": {"color": "#0000FF"}},
+        circlemarker={},
+    )
+
+    def handle_draw(target, action, geo_json):
+        print(action)
+        print(geo_json)
+
+
+    dc.on_draw(handle_draw)
+    cams_map.add_control(dc)
+    cams_map.add_control(lc)
+    
+    return cams_map, dc
+
+
+def get_date_picker(date_descr):
+    """
+    Function to create a date picker, providing a description name.
+    """
+    date = widgets.DatePicker(
+        description=str(date_descr),
+        disabled=False,
+        style= {'description_width': 'initial'})
+    return date
+
+def api_query_cams_forecast(dataset_id, params_sel, product_type_sel, level_sel, type_sel, hour_sel, leadtime_sel, start_date_sel, end_date_sel, format_type_sel,W,N,E,S, token):
+    query = {
+      "datasetId": dataset_id.value,
+      "boundingBoxValues": [
+        {
+          "name": "area",
+          "bbox": [
+            W,
+            N,
+            E,
+            S
+          ]
+        }
+      ],
+      "dateRangeSelectValues": [
+        {
+          "name": "date",
+          "start": start_date_sel.value.strftime("%Y-%m-%dT%H:%M:%S.000Z"),
+          "end": end_date_sel.value.strftime("%Y-%m-%dT%H:%M:%S.000Z")
+        }
+      ],
+      "multiStringSelectValues": [
+        {
+          "name": "variable",
+          "value": list(params_sel.value)
+        },
+        {
+          "name": "model",
+          "value": list(product_type_sel.value)
+        },
+        {
+          "name": "level",
+          "value": list(level_sel.value)
+        },
+        {
+          "name": "type",
+          "value": list(type_sel.value)
+        },
+        {
+          "name": "time",
+          "value": list(hour_sel.value)
+        },
+        {
+          "name": "leadtime_hour",
+          "value": list(leadtime_sel.value)
+        }
+      ],
+      "stringChoiceValues": [
+        {
+          "name": "format",
+          "value": format_type_sel.value
+        }
+      ]
+    }
+      
+    headers = {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'authorization': 'Basic '+str(token)}
+
+    data = json.dumps(query)
+    dataset_post = requests.post("https://wekeo-broker-k8s.apps.mercator.dpi.wekeo.eu/databroker/datarequest", headers=headers, data=data)
+    dataset_post_text = dataset_post.text
+    job_id = json.loads(dataset_post_text)
+    print(dataset_post_text)
+    
+    return job_id
