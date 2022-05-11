@@ -18,5 +18,3 @@ dependencies:
   - rioxarray
   - urllib
   - ipyleaflet
-  - pip
-  - pip:
