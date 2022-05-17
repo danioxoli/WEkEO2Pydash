@@ -261,14 +261,14 @@ def download_type(download_sel, download_list, get_url):
             ds = xr.open_dataset(str(save_as))
     return ds
 
-def draw_map():
+def draw_map(center_lat, center_lon, zoom_level):
     """
     Function to draw a map and interact with it. It is possible to get the coordinates values from the dc variable. Two basemaps are available.
     """
     satellite = basemap_to_tiles(basemaps.Gaode.Satellite)
     osm = basemap_to_tiles(basemaps.OpenStreetMap.Mapnik)
 
-    cams_map = Map(layers=(satellite, osm ), center=(45, 10), zoom=4)
+    cams_map = Map(layers=(satellite, osm ), center=(center_lat, center_lon), zoom=zoom_level)
 
     dc = DrawControl()
     lc = LayersControl(position='topright')
@@ -454,6 +454,55 @@ def api_query_efas_historical(dataset_id, variable_sel, model_levels_sel, system
         {
           "name": "model_levels",
           "value": model_levels_sel.value
+        }
+      ]
+    }
+      
+    headers = {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'authorization': 'Basic '+str(token)}
+
+    data = json.dumps(query)
+    dataset_post = requests.post("https://wekeo-broker-k8s.apps.mercator.dpi.wekeo.eu/databroker/datarequest", headers=headers, data=data)
+    dataset_post_text = dataset_post.text
+    job_id = json.loads(dataset_post_text)
+    print(dataset_post_text)
+    
+    return job_id
+
+def api_query_sea_floor_temperature(dataset_id, start_date_sel, end_date_sel, W, S, E, N, token):
+    query = {
+      "datasetId": dataset_id.value,
+      "boundingBoxValues": [
+        {
+          "name": "bbox",
+          "bbox": [W, S, E, N]
+        }
+      ],
+      "dateRangeSelectValues": [
+        {
+          "name": "position",
+          "start": start_date_sel.value.strftime("%Y-%m-%dT%H:%M:%S.000Z"),
+          "end": end_date_sel.value.strftime("%Y-%m-%dT%H:%M:%S.000Z")
+        }
+      ],
+      "multiStringSelectValues": [
+        {
+          "name": "variable",
+          "value": [
+            "bottomT"
+          ]
+        }
+      ],
+      "stringChoiceValues": [
+        {
+          "name": "service",
+          "value": "NWSHELF_ANALYSISFORECAST_PHY_LR_004_001-TDS"
+        },
+        {
+          "name": "product",
+          "value": "cmems_mod_nws_phy-bottomt_anfc_7km-2D_P1D-m"
         }
       ]
     }
