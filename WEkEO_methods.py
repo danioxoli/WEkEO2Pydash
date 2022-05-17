@@ -72,7 +72,6 @@ def get_token(username, password):
     message_bytes = message.encode('ascii')
     base64_bytes = base64.b64encode(message_bytes)
     base64_message = base64_bytes.decode('ascii')
-    print("Your credential is: "+base64_message)
     headers = {'authorization': 'Basic '+base64_message}
     token_request = requests.get("https://wekeo-broker-k8s.apps.mercator.dpi.wekeo.eu/databroker/gettoken", headers=headers)
     token_text = token_request.text
@@ -219,20 +218,22 @@ def request_data(jobId, token):
     status = status_request.text
     status_message = json.loads(status)['status']
     if status_message == "running":
-        print("Download status: "+ status_message +"...")
+        print("Download status: "+ status_message, end='\r')
     if status_message == "completed":     
-        print("Download status: "+ status_message +"  \u2713")
+        print("Download status: "+ status_message)
+    if status_message == "failed":
+        print("Download status: "+ status_message, end='\r')
 
     while status_message == "running":
         status_request = requests.get('https://wekeo-broker.apps.mercator.dpi.wekeo.eu/databroker/datarequest/status/'+jobId, headers=headers)
         status = status_request.text
         status_message = json.loads(status)['status']
         if status_message == "running":
-            print("Download status: "+ status_message +"...", end='\r')
+            print("Download status: "+ status_message, end='\r')
         if status_message == "completed":     
-            print("Download status: "+ status_message +"  \u2713")
+            print("Download status: "+ status_message)
         if status_message == "failed":
-            print("Download"+ status_message)
+            print("Download status: "+ status_message)
         
     get_url_request = requests.get('https://wekeo-broker.apps.mercator.dpi.wekeo.eu/databroker/datarequest/jobs/'+jobId+'/result', headers=headers)
     get_url = json.loads(get_url_request.text)
@@ -358,3 +359,115 @@ def api_query_cams_forecast(dataset_id, params_sel, product_type_sel, level_sel,
     print(dataset_post_text)
     
     return job_id
+
+def api_query_corine(dataset_id, dataset_name, formats, token):
+    query = {
+      "datasetId": dataset_id.value,
+      "stringChoiceValues": [
+        {
+          "name": "product_type",
+          "value": dataset_name.value
+        },
+        {
+          "name": "format",
+          "value": formats.value
+        }
+      ]
+    }
+      
+    headers = {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'authorization': 'Basic '+str(token)}
+
+    data = json.dumps(query)
+    dataset_post = requests.post("https://wekeo-broker-k8s.apps.mercator.dpi.wekeo.eu/databroker/datarequest", headers=headers, data=data)
+    dataset_post_text = dataset_post.text
+    job_id = json.loads(dataset_post_text)
+    print(dataset_post_text)
+    
+    return job_id
+
+def data_order(job_id, get_url, token):
+    url = get_url['content'][0]['url']
+    headers = {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'authorization': 'Basic '+str(token)}
+    query = {
+        "jobId":str(job_id),
+        "uri":str(url)}
+    data = json.dumps(query)
+    dataset_post_order = requests.post("https://wekeo-broker-k8s.apps.mercator.dpi.wekeo.eu/databroker/dataorder", headers=headers, data=data)
+    dataset_post_order_text = dataset_post_order.text
+    order_id = json.loads(dataset_post_order_text)['orderId']
+
+    return order_id
+
+def download_zip(get_url):
+    url = get_url['content'][0]['url']
+    save_as = get_url['content'][0]['filename']
+    with urlopen(url) as file:
+        content = file.read()
+        with open(save_as, 'wb') as download:
+            download.write(content.read())
+            
+            
+def api_query_efas_historical(dataset_id, variable_sel, model_levels_sel, system_version_sel, year_sel, month_sel, day_sel, time_sel, soil_level_sel, formats, token):
+    query = {
+      "datasetId": dataset_id.value,
+      "multiStringSelectValues": [
+        {
+          "name": "variable",
+          "value": list(variable_sel.value)
+        },
+        {
+          "name": "soil_level",
+          "value": list(soil_level_sel.value)
+        },
+        {
+          "name": "hyear",
+          "value": list(year_sel.value)
+        },
+        {
+          "name": "hmonth",
+          "value": list(month_sel.value)
+        },
+        {
+          "name": "hday",
+          "value": list(day_sel.value)
+        },
+        {
+          "name": "time",
+          "value": list(time_sel.value)
+        }
+      ],
+      "stringChoiceValues": [
+        {
+          "name": "system_version",
+          "value": system_version_sel.value
+        },
+        {
+          "name": "format",
+          "value": formats.value
+        },
+        {
+          "name": "model_levels",
+          "value": model_levels_sel.value
+        }
+      ]
+    }
+      
+    headers = {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'authorization': 'Basic '+str(token)}
+
+    data = json.dumps(query)
+    dataset_post = requests.post("https://wekeo-broker-k8s.apps.mercator.dpi.wekeo.eu/databroker/datarequest", headers=headers, data=data)
+    dataset_post_text = dataset_post.text
+    job_id = json.loads(dataset_post_text)
+    print(dataset_post_text)
+    
+    return job_id
+
