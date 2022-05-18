@@ -2,13 +2,17 @@ import base64
 import requests
 import json
 import pandas as pd
+import numpy as np
 import ipywidgets as widgets
 from ipywidgets import Layout
 from PIL import Image
 import IPython
 import xarray as xr
+import rioxarray as rxr
 from urllib.request import urlopen
 from ipyleaflet import Map, basemaps, basemap_to_tiles, DrawControl, LayersControl
+
+#---WIDGETS---
 
 def get_dropdown(dataset_list, descr):
     """
@@ -80,40 +84,6 @@ def get_token(username, password):
     headers = {'authorization': token['access_token']}
     return headers
 
-def get_all_data_request(size):
-    """
-    Function to get all the information about the datasets available for WEkEO.
-    size: corresponds to the number of dataset to be required
-    """
-    dataset = requests.get("https://wekeo-broker-k8s.apps.mercator.dpi.wekeo.eu/databroker/datasets?size="+str(size))
-    dataset_text = dataset.text
-    data = json.loads(dataset_text)
-    data_df = pd.json_normalize(data['content'])
-    return data_df
-
-def get_data_from_name_request(size, dataset_name):
-    """
-    Function to get information about a specific dataset, such as "cams" or "era5".
-    size: corresponds to the number of dataset to be required.
-    dataset_name: corresponds to the dataset that is required. For example is possible to require "cams" or "era5" data.
-    """
-    dataset = requests.get("https://wekeo-broker-k8s.apps.mercator.dpi.wekeo.eu/databroker/datasets?size="+str(size))
-    dataset_text = dataset.text
-    data = json.loads(dataset_text)
-    data_df = pd.json_normalize(data['content'])
-    data_df = data_df[data_df['datasetId'].str.contains(str(dataset_name),  case=False)]
-    return data_df
-
-    
-def get_description(data_df, dataset_id):
-    """
-    Function used to preview the required dataset, from a pandas dataframe.
-    It returns the preview image of the dataset and its description.
-    """
-    abstract = data_df.loc[data_df['datasetId'] == dataset_id.value]
-    description = list(abstract["abstract"])
-    return description
-
 def display_image(data_df, dataset_id, w, f, h):
     """
     Function to display image from link and get a dataset preview.
@@ -133,6 +103,101 @@ def display_image(data_df, dataset_id, w, f, h):
     height=h)
     return image
 
+def download_type(download_sel, download_list, get_url):
+    """
+    Function that can read the NetCDF file in memory or downloading it if a name is provided.
+    """
+    url = get_url['content'][0]['url']
+    save_as = get_url['content'][0]['filename']
+    
+    if download_sel.value == download_list[1]: 
+        fl = url
+        # load into memory 
+        with urlopen(fl) as f:
+            ds = xr.open_dataset(f.read())
+    elif download_sel.value == download_list[0]:
+        with urlopen(url) as file:
+            content = file.read()
+            with open(save_as, 'wb') as download:
+                download.write(content)
+            ds = xr.open_dataset(str(save_as))
+    return ds
+
+def draw_map(center_lat, center_lon, zoom_level):
+    """
+    Function to draw a map and interact with it. It is possible to get the coordinates values from the dc variable. Two basemaps are available.
+    """
+    satellite = basemap_to_tiles(basemaps.Gaode.Satellite)
+    osm = basemap_to_tiles(basemaps.OpenStreetMap.Mapnik)
+
+    cams_map = Map(layers=(satellite, osm ), center=(center_lat, center_lon), zoom=zoom_level)
+
+    dc = DrawControl()
+    lc = LayersControl(position='topright')
+
+    dc = DrawControl(
+        marker={"shapeOptions": {"color": "#0000FF"}},
+        rectangle={"shapeOptions": {"color": "#0000FF"}},
+        circle={"shapeOptions": {"color": "#0000FF"}},
+        circlemarker={},
+    )
+
+    def handle_draw(target, action, geo_json):
+        print(action)
+        print(geo_json)
+
+
+    dc.on_draw(handle_draw)
+    cams_map.add_control(dc)
+    cams_map.add_control(lc)
+    
+    return cams_map, dc
+
+
+#------
+
+def download_zip(get_url):
+    url = get_url['content'][0]['url']
+    save_as = get_url['content'][0]['filename']
+    with urlopen(url) as file:
+        content = file.read()
+        with open(save_as, 'wb') as download:
+            download.write(content.read())
+
+def get_all_data_request(size):
+    """
+    Function to get all the information about the datasets available for WEkEO.
+    size: corresponds to the number of dataset to be required
+    """
+    dataset = requests.get("https://wekeo-broker-k8s.apps.mercator.dpi.wekeo.eu/databroker/datasets?size="+str(size))
+    dataset_text = dataset.text
+    data = json.loads(dataset_text)
+    data_df = pd.json_normalize(data['content'])
+    return data_df
+
+def get_data_from_name_request(size, dataset_name):
+    """
+    Function to get information about a specific dataset, such as "cams" or "era5".
+    size: corresponds to the number of dataset to be required.
+    dataset_name: corresponds to the dataset that is required.
+    """
+    dataset = requests.get("https://wekeo-broker-k8s.apps.mercator.dpi.wekeo.eu/databroker/datasets?size="+str(size))
+    dataset_text = dataset.text
+    data = json.loads(dataset_text)
+    data_df = pd.json_normalize(data['content'])
+    data_df = data_df[data_df['datasetId'].str.contains(str(dataset_name),  case=False)]
+    return data_df
+
+    
+def get_description(data_df, dataset_id):
+    """
+    Function used to preview the required dataset, from a pandas dataframe.
+    It returns the preview image of the dataset and its description.
+    """
+    abstract = data_df.loc[data_df['datasetId'] == dataset_id.value]
+    description = list(abstract["abstract"])[0]
+    return description
+
 def get_metadata(dataset_id, headers):
     """
     Function used to get metadata in JSON format for the selected dataset.
@@ -142,7 +207,61 @@ def get_metadata(dataset_id, headers):
     metadata = json.loads(dataset_text)
     return metadata
 
+def request_data(jobId, token):
+    """
+    Function to request data, check the status and get data url for download.
+    """
+    headers = {'authorization': 'Basic '+str(token)}
+    status_request = requests.get('https://wekeo-broker.apps.mercator.dpi.wekeo.eu/databroker/datarequest/status/'+jobId, headers=headers)
+    status = status_request.text
+    status_message = json.loads(status)['status']
+    if status_message == "running":
+        print("Download status: "+ status_message, end='\r')
+    if status_message == "completed":     
+        print("Download status: "+ status_message)
+    if status_message == "failed":
+        print("Download status: "+ status_message, end='\r')
+
+    while status_message == "running":
+        status_request = requests.get('https://wekeo-broker.apps.mercator.dpi.wekeo.eu/databroker/datarequest/status/'+jobId, headers=headers)
+        status = status_request.text
+        status_message = json.loads(status)['status']
+        if status_message == "running":
+            print("Download status: "+ status_message, end='\r')
+        if status_message == "completed":     
+            print("Download status: "+ status_message)
+        if status_message == "failed":
+            print("Download status: "+ status_message)
+        
+    get_url_request = requests.get('https://wekeo-broker.apps.mercator.dpi.wekeo.eu/databroker/datarequest/jobs/'+jobId+'/result', headers=headers)
+    get_url = json.loads(get_url_request.text)
+    url = get_url['content'][0]['url']
+    print('The URL for download is: '+ get_url['content'][0]['url'])
+    return get_url
+
+def data_order(job_id, get_url, token):
+    '''
+    Function to order data. Not all the datasets requires this function to download the data.
+    '''
+    url = get_url['content'][0]['url']
+    headers = {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'authorization': 'Basic '+str(token)}
+    query = {
+        "jobId":str(job_id),
+        "uri":str(url)}
+    data = json.dumps(query)
+    dataset_post_order = requests.post("https://wekeo-broker-k8s.apps.mercator.dpi.wekeo.eu/databroker/dataorder", headers=headers, data=data)
+    dataset_post_order_text = dataset_post_order.text
+    order_id = json.loads(dataset_post_order_text)['orderId']
+
+    return order_id
+
 def era5_single_levels_list(metadata):
+    '''
+    Function to obtain the list of variables available in ERA5 Single Level.
+    '''
     category = metadata['parameters']['multiStringSelects'][0]['details']['groupedValueLabels']
     category_list = []
     params_list = []
@@ -209,90 +328,10 @@ def api_query_era5_single_levels(dataset_id, params_sel, year_sel, month_sel, da
     print(dataset_post_text)
     return job_id
 
-def request_data(jobId, token):
-    """
-    Function to request data, check the status and get the url.
-    """
-    headers = {'authorization': 'Basic '+str(token)}
-    status_request = requests.get('https://wekeo-broker.apps.mercator.dpi.wekeo.eu/databroker/datarequest/status/'+jobId, headers=headers)
-    status = status_request.text
-    status_message = json.loads(status)['status']
-    if status_message == "running":
-        print("Download status: "+ status_message, end='\r')
-    if status_message == "completed":     
-        print("Download status: "+ status_message)
-    if status_message == "failed":
-        print("Download status: "+ status_message, end='\r')
-
-    while status_message == "running":
-        status_request = requests.get('https://wekeo-broker.apps.mercator.dpi.wekeo.eu/databroker/datarequest/status/'+jobId, headers=headers)
-        status = status_request.text
-        status_message = json.loads(status)['status']
-        if status_message == "running":
-            print("Download status: "+ status_message, end='\r')
-        if status_message == "completed":     
-            print("Download status: "+ status_message)
-        if status_message == "failed":
-            print("Download status: "+ status_message)
-        
-    get_url_request = requests.get('https://wekeo-broker.apps.mercator.dpi.wekeo.eu/databroker/datarequest/jobs/'+jobId+'/result', headers=headers)
-    get_url = json.loads(get_url_request.text)
-    url = get_url['content'][0]['url']
-    print('The URL for download is: '+ get_url['content'][0]['url'])
-    return get_url
-
-def download_type(download_sel, download_list, get_url):
-    """
-    Function that can read the NetCDF file in memory or downloading it if a name is provided.
-    """
-    url = get_url['content'][0]['url']
-    save_as = get_url['content'][0]['filename']
-    
-    if download_sel.value == download_list[1]: 
-        fl = url
-        # load into memory 
-        with urlopen(fl) as f:
-            ds = xr.open_dataset(f.read())
-    elif download_sel.value == download_list[0]:
-        with urlopen(url) as file:
-            content = file.read()
-            with open(save_as, 'wb') as download:
-                download.write(content)
-            ds = xr.open_dataset(str(save_as))
-    return ds
-
-def draw_map(center_lat, center_lon, zoom_level):
-    """
-    Function to draw a map and interact with it. It is possible to get the coordinates values from the dc variable. Two basemaps are available.
-    """
-    satellite = basemap_to_tiles(basemaps.Gaode.Satellite)
-    osm = basemap_to_tiles(basemaps.OpenStreetMap.Mapnik)
-
-    cams_map = Map(layers=(satellite, osm ), center=(center_lat, center_lon), zoom=zoom_level)
-
-    dc = DrawControl()
-    lc = LayersControl(position='topright')
-
-    dc = DrawControl(
-        marker={"shapeOptions": {"color": "#0000FF"}},
-        rectangle={"shapeOptions": {"color": "#0000FF"}},
-        circle={"shapeOptions": {"color": "#0000FF"}},
-        circlemarker={},
-    )
-
-    def handle_draw(target, action, geo_json):
-        print(action)
-        print(geo_json)
-
-
-    dc.on_draw(handle_draw)
-    cams_map.add_control(dc)
-    cams_map.add_control(lc)
-    
-    return cams_map, dc
-
-
 def api_query_cams_forecast(dataset_id, params_sel, product_type_sel, level_sel, type_sel, hour_sel, leadtime_sel, start_date_sel, end_date_sel, format_type_sel,W,N,E,S, token):
+    '''
+    Function to request data from CAMS Forecast dataset.
+    '''
     query = {
       "datasetId": dataset_id.value,
       "boundingBoxValues": [
@@ -359,61 +398,11 @@ def api_query_cams_forecast(dataset_id, params_sel, product_type_sel, level_sel,
     print(dataset_post_text)
     
     return job_id
-
-def api_query_corine(dataset_id, dataset_name, formats, token):
-    query = {
-      "datasetId": dataset_id.value,
-      "stringChoiceValues": [
-        {
-          "name": "product_type",
-          "value": dataset_name.value
-        },
-        {
-          "name": "format",
-          "value": formats.value
-        }
-      ]
-    }
-      
-    headers = {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        'authorization': 'Basic '+str(token)}
-
-    data = json.dumps(query)
-    dataset_post = requests.post("https://wekeo-broker-k8s.apps.mercator.dpi.wekeo.eu/databroker/datarequest", headers=headers, data=data)
-    dataset_post_text = dataset_post.text
-    job_id = json.loads(dataset_post_text)
-    print(dataset_post_text)
-    
-    return job_id
-
-def data_order(job_id, get_url, token):
-    url = get_url['content'][0]['url']
-    headers = {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        'authorization': 'Basic '+str(token)}
-    query = {
-        "jobId":str(job_id),
-        "uri":str(url)}
-    data = json.dumps(query)
-    dataset_post_order = requests.post("https://wekeo-broker-k8s.apps.mercator.dpi.wekeo.eu/databroker/dataorder", headers=headers, data=data)
-    dataset_post_order_text = dataset_post_order.text
-    order_id = json.loads(dataset_post_order_text)['orderId']
-
-    return order_id
-
-def download_zip(get_url):
-    url = get_url['content'][0]['url']
-    save_as = get_url['content'][0]['filename']
-    with urlopen(url) as file:
-        content = file.read()
-        with open(save_as, 'wb') as download:
-            download.write(content.read())
-            
             
 def api_query_efas_historical(dataset_id, variable_sel, model_levels_sel, system_version_sel, year_sel, month_sel, day_sel, time_sel, soil_level_sel, formats, token):
+    '''
+    Function to request EFAS Historical data (CEMS) - Emergency
+    '''
     query = {
       "datasetId": dataset_id.value,
       "multiStringSelectValues": [
@@ -472,6 +461,9 @@ def api_query_efas_historical(dataset_id, variable_sel, model_levels_sel, system
     return job_id
 
 def api_query_sea_floor_temperature(dataset_id, start_date_sel, end_date_sel, W, S, E, N, token):
+    '''
+    Function to request data Sea Bottom Temperature (CMEMS) - Marine
+    '''
     query = {
       "datasetId": dataset_id.value,
       "boundingBoxValues": [
@@ -520,3 +512,33 @@ def api_query_sea_floor_temperature(dataset_id, start_date_sel, end_date_sel, W,
     
     return job_id
 
+def api_query_corine(dataset_id, dataset_name, formats, token):
+    '''
+    Function to request data for Corine dataset (CLMS)
+    '''
+    query = {
+      "datasetId": dataset_id.value,
+      "stringChoiceValues": [
+        {
+          "name": "product_type",
+          "value": dataset_name.value
+        },
+        {
+          "name": "format",
+          "value": formats.value
+        }
+      ]
+    }
+      
+    headers = {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'authorization': 'Basic '+str(token)}
+
+    data = json.dumps(query)
+    dataset_post = requests.post("https://wekeo-broker-k8s.apps.mercator.dpi.wekeo.eu/databroker/datarequest", headers=headers, data=data)
+    dataset_post_text = dataset_post.text
+    job_id = json.loads(dataset_post_text)
+    print(dataset_post_text)
+    
+    return job_id
