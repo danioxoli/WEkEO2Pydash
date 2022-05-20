@@ -3,7 +3,6 @@ channels:
   - conda-forge
   - defaults
 dependencies:
-  - python>=3.9
   - numpy
   - cartopy
   - matplotlib
@@ -17,7 +16,9 @@ dependencies:
   - netCDF4
   - bottleneck
   - urllib3
+  - geoviews
   - pandas
+  - networkx
   - pip
   - pip:
     - pyviz

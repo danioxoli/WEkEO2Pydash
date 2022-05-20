@@ -2,6 +2,7 @@ import base64
 import requests
 import json
 import pandas as pd
+from pandas.io.json import json_normalize
 import numpy as np
 import ipywidgets as widgets
 from ipywidgets import Layout
@@ -68,7 +69,7 @@ def get_date_picker(date_descr):
         style= {'description_width': 'initial'})
     return date
     
-def get_token(username, password):
+def get_headers(username, password):
     """
     Provide username and password to allow the login for WEkEO data access.
     """
@@ -82,7 +83,7 @@ def get_token(username, password):
     token = json.loads(token_text)
     print("Your access token is: "+token['access_token'])
     headers = {'authorization': token['access_token']}
-    return token['access_token']
+    return headers
 
 def display_image(data_df, dataset_id, w, f, h):
     """
@@ -172,7 +173,7 @@ def get_all_data_request(size):
     dataset = requests.get("https://wekeo-broker-k8s.apps.mercator.dpi.wekeo.eu/databroker/datasets?size="+str(size))
     dataset_text = dataset.text
     data = json.loads(dataset_text)
-    data_df = pd.json_normalize(data['content'])
+    data_df = json_normalize(data['content'])
     return data_df
 
 def get_data_from_name_request(size, dataset_name):
@@ -184,7 +185,7 @@ def get_data_from_name_request(size, dataset_name):
     dataset = requests.get("https://wekeo-broker-k8s.apps.mercator.dpi.wekeo.eu/databroker/datasets?size="+str(size))
     dataset_text = dataset.text
     data = json.loads(dataset_text)
-    data_df = pd.json_normalize(data['content'])
+    data_df = json_normalize(data['content'])
     data_df = data_df[data_df['datasetId'].str.contains(str(dataset_name),  case=False)]
     return data_df
 
