@@ -3,18 +3,22 @@ channels:
   - conda-forge
   - defaults
 dependencies:
-  - xarray
-  - pandas
   - numpy
   - cartopy
   - matplotlib
-  - hvplot
-  - holoviews
-  - bokeh
   - ipywidgets
-  - base64
-  - json
   - requests
   - rioxarray
-  - urllib
   - ipyleaflet
+  - holoviews
+  - bokeh
+  - xarray
+  - netCDF4
+  - bottleneck
+  - urllib3
+  - pip
+  - pip:
+    - pyviz
+    - hvplot
+    - python==3.9.12
+    - pandas

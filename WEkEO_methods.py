@@ -82,7 +82,7 @@ def get_token(username, password):
     token = json.loads(token_text)
     print("Your access token is: "+token['access_token'])
     headers = {'authorization': token['access_token']}
-    return headers
+    return token['access_token']
 
 def display_image(data_df, dataset_id, w, f, h):
     """
