@@ -16,6 +16,6 @@ dependencies:
   - urllib3
   - pandas
   - networkx
-  - zipfile
-  - imageio
-  - pip
+  - pip:
+    - imageio
+    - basemap
