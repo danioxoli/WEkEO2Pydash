@@ -1,62 +1,8 @@
-import pandas as pd
-import numpy as np
-import ipywidgets as widgets
 import xarray as xr
 import rioxarray as rxr
 from urllib.request import urlopen
 from ipyleaflet import Map, basemaps, basemap_to_tiles, DrawControl, LayersControl
 
-# Create widgets
-def text_widget(type_text):
-    text = widgets.Text(
-    placeholder='Type something',
-    description=str(type_text),
-    disabled=False,
-    style= {'description_width': 'initial'})
-    return text
-
-def password_widget(type_password):
-    password = widgets.Password(
-    placeholder='Type password',
-    description=str(type_password),
-    disabled=False,
-    style= {'description_width': 'initial'})
-    return password
-
-def get_dropdown(dataset_list, descr):
-    dropdown = widgets.Dropdown(
-    options=list(dataset_list),
-    description=str(descr),
-    disabled=False,
-    style= {'description_width': 'initial'})
-    return dropdown
-
-def select_multiple(data_list, descr):
-    selections = widgets.SelectMultiple(
-    options=data_list,
-    description=str(descr),
-    disabled=False,
-    style= {'description_width': 'initial'})
-    return selections
-
-def select_buttons(data_list, descr, default_value):
-    button_selection = widgets.RadioButtons(
-    options=data_list,
-    value=str(default_value),
-    description=str(descr),
-    disabled=False,
-    style= {'description_width': 'initial'})
-    return button_selection
-
-def get_date_picker(date_descr):
-    """
-    Function to create a date picker, providing a description name.
-    """
-    date = widgets.DatePicker(
-        description=str(date_descr),
-        disabled=False,
-        style= {'description_width': 'initial'})
-    return date
 
 def download_type(download_sel, download_list, get_url):
     """

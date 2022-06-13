@@ -23,15 +23,17 @@ def get_dropdown(dataset_list, descr):
     options=list(dataset_list),
     description=str(descr),
     disabled=False,
-    style= {'description_width': 'initial'})
+    style= {'description_width': '150px'},
+    layout = {'width': '400px'})
     return dropdown
 
 def text_widget(type_text):
-    text = widgets.Text(
+    widgets.Password(
     placeholder='Type something',
     description=str(type_text),
     disabled=False,
-    style= {'description_width': 'initial'})
+    style= {'description_width': '150px'},
+    layout = {'width': '400px'})
     return text
 
 def password_widget(type_password):
@@ -39,7 +41,8 @@ def password_widget(type_password):
     placeholder='Type password',
     description=str(type_password),
     disabled=False,
-    style= {'description_width': 'initial'})
+    style= {'description_width': '150px'},
+    layout = {'width': '400px'})
     return password
 
 def select_multiple(data_list, descr):
@@ -47,7 +50,8 @@ def select_multiple(data_list, descr):
     options=data_list,
     description=str(descr),
     disabled=False,
-    style= {'description_width': 'initial'})
+    style= {'description_width': '150px'},
+    layout = {'width': '400px'})
     return selections
 
 def select_buttons(data_list, descr, default_value):
@@ -56,7 +60,8 @@ def select_buttons(data_list, descr, default_value):
     value=str(default_value),
     description=str(descr),
     disabled=False,
-    style= {'description_width': 'initial'})
+    style= {'description_width': '150px'},
+    layout = {'width': '400px'})
     return format_type_sel
 
 def get_date_picker(date_descr):
@@ -66,7 +71,8 @@ def get_date_picker(date_descr):
     date = widgets.DatePicker(
         description=str(date_descr),
         disabled=False,
-        style= {'description_width': 'initial'})
+        style= {'description_width': '150px'},
+        layout = {'width': '400px'})
     return date
     
 def get_headers(username, password):
