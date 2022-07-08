@@ -1,0 +1,22 @@
+name: copernicus
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - numpy
+  - cartopy
+  - matplotlib
+  - ipywidgets
+  - requests
+  - rioxarray
+  - ipyleaflet
+  - xarray[complete]
+  - netCDF4
+  - bottleneck
+  - urllib3
+  - pandas
+  - networkx
+  - imageio
+  - basemap
+  - itables
+  - pip
