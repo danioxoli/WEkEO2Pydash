@@ -1,5 +1,6 @@
-# notebook_competition
-A repository of useful things for the WEkEO Jupyter Notebook competition...
+# WEkEO2Pydash - Explore Copernicus data interactively using the WEkEO HDA API
+### WEkEO Jupyter Notebook competition
+
 
 In this repository you will find a basic template you could use for your submission to the Jupyter notebook competition. It includes some useful scaffolding that can help your notebook to be easily followed by other people. 
 
