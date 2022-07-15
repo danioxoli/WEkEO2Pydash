@@ -9,7 +9,7 @@ The final goal is to provide the user with reusable code blocks which can be ada
 
 ### Resources
 
-This Notebook make extensive use of the [<span style='color:Blue'> WEkEO HDA API</span>](https://www.wekeo.eu/docs/harmonised-data-access-api) to perform `GET` and `POST` requests[<sup>1</sup>](#1), necessary for automating the data access procedures.
+This Notebook make extensive use of the [<span style='color:Blue'> WEkEO HDA API</span>](https://www.wekeo.eu/docs/harmonised-data-access-api) to perform `GET` and `POST` requests, necessary for automating the data access procedures.
 
 Interactivity is enabled by cutting-edge Python libraries for dynamic widgets and maps generation including [<span style='color:Blue'>IPython</span>](https://ipython.org), [<span style='color:Blue'>itables</span>](https://mwouts.github.io/itables/advanced_parameters.html), [<span style='color:Blue'>IPyWidgets</span>](https://ipywidgets.readthedocs.io/en/latest/index.html#) and [<span style='color:Blue'>ipyleaflet</span>](https://ipyleaflet.readthedocs.io); alongside popular data mananging and analysis libraries such as [<span style='color:Blue'>Pandas</span>](https://pandas.pydata.org) and [<span style='color:Blue'>xarray</span>](https://docs.xarray.dev). All the selected libraries are released under open-license[<sup>2</sup>](#2) compatible with [<span style='color:Blue'>MIT license</span>](https://en.wikipedia.org/wiki/MIT_License). 
 
@@ -34,8 +34,6 @@ At the end of this Notebook you will know:
 * How to generate dynamic data previews using interactive Python widgets
 * How to adapt and reuse Python functions and code blocks to deal with different WEkEO data products and applications
 
-
-<span id="1">[$^1$Swagger UI](https://wekeo-broker.apps.mercator.dpi.wekeo.eu/databroker/ui/#!/HDA_-_dataorder/dataorder_get)</span> 
 
 <span id="2">[$^2$About Open Source Licenses](https://opensource.org/licenses)</span> 
 
