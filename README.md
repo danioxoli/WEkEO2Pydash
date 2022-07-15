@@ -35,11 +35,11 @@ At the end of this Notebook you will know:
 * How to adapt and reuse Python functions and code blocks to deal with different WEkEO data products and applications
 
 
-<span id="1">[$^1$Swagger UI](https://wekeo-broker.apps.mercator.dpi.wekeo.eu/databroker/ui/#!/HDA_-_dataorder/dataorder_get)</span> 
+<span id="1">[<sup>1</sup>Swagger UI](https://wekeo-broker.apps.mercator.dpi.wekeo.eu/databroker/ui/#!/HDA_-_dataorder/dataorder_get)</span> 
 
-<span id="2">[$^2$About Open Source Licenses](https://opensource.org/licenses)</span> 
+<span id="2">[<sup>2</sup>About Open Source Licenses](https://opensource.org/licenses)</span> 
 
-<span id="3">[$^3$WEkEO Data Discovery Platform](https://www.wekeo.eu/data)</span> 
+<span id="3">[<sup>3</sup>WEkEO Data Discovery Platform](https://www.wekeo.eu/data)</span> 
 
 
 <strong>Authors:</strong> Oxoli Daniele (*daniele.oxoli@polimi.it*), Capizzi Emanuele (*emanuele.capizzi@polimi.it*) - 2022 - Politecnico di Milano <br>
