@@ -42,5 +42,5 @@ At the end of this Notebook you will know:
 <span id="3">[$^3$WEkEO Data Discovery Platform](https://www.wekeo.eu/data)</span> 
 
 <div class="alert alert-info">
-<strong>Authors:</strong> Oxoli Daniele, Capizzi Emanuele - 2022 - Politecnico di Milano <br>
+<strong>Authors:</strong> Oxoli Daniele (_daniele.oxoli@polimi.it_), Capizzi Emanuele (_emanuele.capizzi@polimi.it_) - 2022 - Politecnico di Milano <br>
 </div>
