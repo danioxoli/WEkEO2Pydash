@@ -1,4 +1,4 @@
-name: copernicus
+name: wekeo2pydash
 channels:
   - conda-forge
   - defaults
