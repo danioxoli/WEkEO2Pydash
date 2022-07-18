@@ -6,7 +6,7 @@ from ipyleaflet import Map, basemaps, basemap_to_tiles, DrawControl, LayersContr
 
 def download_type(download_sel, download_list, get_url):
     """
-    Function that can read the NetCDF file in memory or downloading it using its original filename.
+    Function to read a NetCDF file in memory or download it using its original filename.
     """
     url = get_url['content'][0]['url']
     save_as = get_url['content'][0]['filename']
@@ -26,7 +26,7 @@ def download_type(download_sel, download_list, get_url):
 
 def draw_map(center_lat, center_lon, zoom_level):
     """
-    Function to draw a map and interact with it. It is possible to get the coordinates values from the dc variable. Two basemaps are available.
+    Function to draw an ipyleaflet map and interact with it. It is possible to get the coordinates values from the dc variable. Two basemaps are available.
     """
     satellite = basemap_to_tiles(basemaps.Gaode.Satellite)
     osm = basemap_to_tiles(basemaps.OpenStreetMap.Mapnik)
