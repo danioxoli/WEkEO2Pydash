@@ -11,12 +11,12 @@ def download_type(download_sel, download_list, get_url):
     url = get_url['content'][0]['url']
     save_as = get_url['content'][0]['filename']
     
-    if download_sel.value == "Read NETCDF in memory": 
+    if download_sel.value == "Read NetCDF in memory": 
         fl = url
         # load into memory 
         with urlopen(fl) as f:
             ds = xr.open_dataset(f.read())
-    elif download_sel.value == "Download NETCDF":
+    elif download_sel.value == "Download NetCDF":
         with urlopen(url) as file:
             content = file.read()
             with open(save_as, 'wb') as download:
