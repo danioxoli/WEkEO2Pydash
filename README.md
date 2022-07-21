@@ -2,7 +2,7 @@
 ### WEkEO Jupyter Notebook competition: https://notebook.wekeo.eu 
 **Track A**: *Exploit the broad range of Copernicus Data*
 
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/danioxoli/WEkEO2Pydash/HEAD?labpath=https%3A%2F%2Fgithub.com%2Fdanioxoli%2FWEkEO2Pydash%2Fblob%2Fmain%2Fwekeo2pydash.ipynb)
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/danioxoli/WEkEO2Pydash/HEAD)
 
 This Notebook showcases Python recipes to interact (access, browse, display and download) with the Copernicus data dispatched by the [<span style='color:Blue'>WEkEO DIAS</span>](https://www.wekeo.eu), through the development of flexible and interactive dashboards into a Jupyter notebook. 
 
