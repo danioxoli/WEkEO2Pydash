@@ -39,17 +39,16 @@ def draw_map(center_lat, center_lon, zoom_level):
     dc = DrawControl(
         marker={"shapeOptions": {"color": "#0000FF"}},
         rectangle={"shapeOptions": {"color": "#0000FF"}},
-        circle={"shapeOptions": {"color": "#0000FF"}},
-        circlemarker={},
+        circlemarker={}, polyline={}, polygon={}
     )
 
     def handle_draw(target, action, geo_json):
         print(action)
         print(geo_json)
 
-
     dc.on_draw(handle_draw)
     cams_map.add_control(dc)
     cams_map.add_control(lc)
+    
     
     return cams_map, dc
