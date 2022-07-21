@@ -6,7 +6,7 @@ This Notebook showcases Python recipes to interact (access, browse, display and 
 
 **Interactivity** is here used as the key element to speed-up applications development by minimizing code editing for recursive steps such as variables definition and parameters setting.
 
-The final goal is to provide the user with reusable code blocks which can be adapted *- with a small effort -* to manifold EO applications by leveraging the [<span style='color:Blue'>WEkEO Harmonised Data Access (HDA) API </span>](https://www.wekeo.eu/docs/harmonised-data-access-api) as exclusive data endpoint. 
+The final goal is to provide the user with reusable code blocks which can be adapted *- with a small effort -* to manifold Copernicus data applications by leveraging the [<span style='color:Blue'>WEkEO Harmonised Data Access (HDA) API </span>](https://www.wekeo.eu/docs/harmonised-data-access-api) as exclusive data endpoint. 
 
 ### Resources
 
