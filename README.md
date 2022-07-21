@@ -1,5 +1,6 @@
 # WEkEO2Pydash - Explore Copernicus data interactively using the WEkEO HDA API
-### WEkEO Jupyter Notebook competition: https://notebook.wekeo.eu
+### WEkEO Jupyter Notebook competition: https://notebook.wekeo.eu 
+**Track A**: *Exploit the broad range of Copernicus Data*
 
 This Notebook showcases Python recipes to interact (access, browse, display and download) with the Copernicus data dispatched by the [<span style='color:Blue'>WEkEO DIAS</span>](https://www.wekeo.eu), through the development of flexible and interactive dashboards into a Jupyter notebook. 
 
@@ -14,7 +15,7 @@ This Notebook make extensive use of the [<span style='color:Blue'> WEkEO HDA API
 Interactivity is enabled by cutting-edge Python libraries for dynamic widgets and maps generation including [<span style='color:Blue'>IPython</span>](https://ipython.org), [<span style='color:Blue'>itables</span>](https://mwouts.github.io/itables/advanced_parameters.html), [<span style='color:Blue'>IPyWidgets</span>](https://ipywidgets.readthedocs.io/en/latest/index.html#) and [<span style='color:Blue'>ipyleaflet</span>](https://ipyleaflet.readthedocs.io); alongside popular data mananging and analysis libraries such as [<span style='color:Blue'>Pandas</span>](https://pandas.pydata.org) and [<span style='color:Blue'>xarray</span>](https://docs.xarray.dev). All the selected libraries are released under open-license[<sup>2</sup>](#2) compatible with [<span style='color:Blue'>MIT license</span>](https://en.wikipedia.org/wiki/MIT_License). 
 
 
-The pattern proposed by this Notebook is developed and demonstrated through few examples, adapted to different data products[<sup>3</sup>](#3) provided by the WEkEO DIAS. Specifically, the data products considered in this Notebook are reported in the following table.
+The pattern proposed by this Notebook is developed and demonstrated through examples, adapted to different data products[<sup>3</sup>](#3) provided by the WEkEO DIAS. Specifically, the data products considered in this Notebook are reported in the following table.
 
 | Product Description | Product Link | ID | Metadata |
 |:--------------------:|:-----------------------:|:-----------------:|:-----------------:|
