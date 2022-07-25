@@ -49,6 +49,6 @@ At the end of this Notebook you will know:
 
 -------
 
-### Folder structure
+### Repository structure
 
 
