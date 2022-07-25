@@ -46,3 +46,9 @@ At the end of this Notebook you will know:
 
 <ins><b>Authors:</b></ins> <b>*Oxoli Daniele*</b> (daniele.oxoli@polimi.it), <b>*Emanuele Capizzi*</b> (emanuele.capizzi@polimi.it) - 2022
 
+
+-------
+
+### Folder structure
+
+
