@@ -60,6 +60,7 @@ root/
 │   ├── login.gif
 ├── LICENSE                        # License file
 ├── README.md                      # Readme file
+├── environment.yml                # Python environment file
 ├── wekeo2pydash.ipynb             # Notebook
 ├── wekeo2pydash_ipynb.pdf         # PDF of the Notebook
 └── wekeo2pydash_methods.py        # Custom Python functions used in the Notebook
