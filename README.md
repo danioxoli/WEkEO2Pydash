@@ -51,4 +51,17 @@ At the end of this Notebook you will know:
 
 ### Repository structure
 
+```bash
+root/ 
+├── img/                           # Folder with notebook images
+│   ├── add_dataset.jpg
+│   ├── dataset_id.gif
+│   ├── gif_query.gif
+│   ├── login.gif
+├── LICENSE                        # License file
+├── README.md                      # Readme file
+├── wekeo2pydash.ipynb             # Notebook
+├── wekeo2pydash_ipynb.pdf         # PDF of the notebook
+└── wekeo2pydash_methods.py        # Custom methods used in the notebook
+```
 
